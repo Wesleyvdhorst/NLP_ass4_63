@@ -100,24 +100,21 @@ def minibatch_parse(sentences, model, batch_size):
                                                     same as in sentences (i.e., dependencies[i] should
                                                     contain the parse for sentences[i]).
     """
-    dependencies = []
 
-    ### YOUR CODE HERE (~8-10 Lines)
-    ### TODO:
-    ###     Implement the minibatch parse algorithm.  Note that the pseudocode for this algorithm is given in the pdf handout.
-    ###
-    ###     Note: A shallow copy (as denoted in the PDF) can be made with the "=" sign in python, e.g.
-    ###                 unfinished_parses = partial_parses[:].
-    ###             Here `unfinished_parses` is a shallow copy of `partial_parses`.
-    ###             In Python, a shallow copied list like `unfinished_parses` does not contain new instances
-    ###             of the object stored in `partial_parses`. Rather both lists refer to the same objects.
-    ###             In our case, `partial_parses` contains a list of partial parses. `unfinished_parses`
-    ###             contains references to the same objects. Thus, you should NOT use the `del` operator
-    ###             to remove objects from the `unfinished_parses` list. This will free the underlying memory that
-    ###             is being accessed by `partial_parses` and may cause your code to crash.
+    partial_parses = [PartialParse(sentence) for sentence in sentences]
+    unfinished_parses = partial_parses[:]
 
-    ### END YOUR CODE
+    while unfinished_parses:
+        minibatch = unfinished_parses[:batch_size]
+        transitions = model.predict(minibatch)
 
+        for i in range(len(minibatch)):
+            minibatch[i].parse_step(transitions[i])
+
+        unfinished_parses = [parse for parse in unfinished_parses if
+                             not (len(parse.stack) == 1 and len(parse.buffer) == 0)]
+
+    dependencies = [parse.dependencies for parse in partial_parses]
     return dependencies
 
 
