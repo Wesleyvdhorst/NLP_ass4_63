@@ -7,6 +7,7 @@ Authors: Sahil Chopra, Haoshen Hong, Nathan Schneider, Lucia Donatelli
 """
 
 import sys
+import copy
 
 
 class PartialParse(object):
@@ -33,8 +34,10 @@ class PartialParse(object):
         ### Note: If you need to use the sentence object to initialize anything, make sure to not directly 
         ###       reference the sentence object.  That is, remember to NOT modify the sentence object. 
 
+
         self.stack = ["ROOT"]
-        self.buffer = list(sentence)
+        #copy is imported above.
+        self.buffer = copy.deepcopy(list(sentence))
         self.dependencies = []
 
         ### END YOUR CODE
